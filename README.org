@@ -1,0 +1,53 @@
+* これは何?
+
+  [[https://kibe.la][Kibela]] という情報共有ツールに投稿されている記事を
+  Emacs の [[https://github.com/abo-abo/swiper#ivy][Ivy]] という絞り込みインターフェースを使って記事を探すためのパッケージです。
+
+* インストール
+
+** 依存関係
+
+   ivy-kibela は以下のパッケージに依存しているので事前にインストールしておいてください
+
+   - ivy :: 0.13.0
+   - graphql :: 0.1.1
+
+** el-get でのインストール
+
+   #+begin_example
+   (el-get-bundle mugijiru/ivy-kibela)
+   #+end_example
+
+* 設定
+
+  ~ivy-kibela-team~ と ~ivy-kibela-access-token~ というカスタム変数を用意しています。
+
+  ~ivy-kibela-team~ は貴方が所属しているチームの subdomain です。
+  もしログイン先が ~https://foo.kibe.la~ であればここの値は ~foo~ となります。
+
+  ~ivy-kibela-access-token~ はあなたの個人アクセストークンを設定します。
+
+  個人アクセストークンは Kibela にログイン後、
+  右上の顔アイコン→設定→個人アクセストークンと辿り、
+  「アクセストークンの作成」をクリックすることで作成できます。
+
+  ivy-kibela では書き込みはしないので、read 権限だけ有効にすることをオススメします。
+
+** コードによる設定例
+
+   #+begin_src emacs-lisp
+   (custom-set-variables
+    '(ivy-kibela-team "foo")
+    '(ivy-kibela-access-token "secret/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")))
+   #+end_src
+
+* 使い方
+
+  ivy-kibela コマンドを実行することで、直近100件の記事を取得します。
+
+  #+begin_example
+  M-x ivy-kibela
+  #+end_example
+
+  そのあとは ivy のインターフェースでその100件の記事から絞り込みます。
+  記事を選択し Enter を叩くことでその記事をブラウザで開くようになっています。
