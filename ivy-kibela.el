@@ -3,7 +3,7 @@
 ;; Copyright (C) 2022  Mugijiru
 
 ;; Author: Mugijiru <mugijiru@manjaro>
-;; Package-Requires: ((emacs "28.1") (ivy "0.13.0") (graphql "0.1.1"))
+;; Package-Requires: ((emacs "28.1") (ivy "0.13.0") (graphql "0.1.1") (request 0.3.3))
 ;; Version: 0.1.0
 
 ;; This program is free software; you can redistribute it and/or modify
