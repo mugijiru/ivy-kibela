@@ -73,7 +73,8 @@
 
 (defun ivy-kibela-action (title)
   (let ((url (get-text-property 0 'url title)))
-    (browse-url url)))
+    (if url
+        (browse-url url))))
 
 (defun ivy-kibela ()
   (interactive)
