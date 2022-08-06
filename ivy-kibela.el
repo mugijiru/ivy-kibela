@@ -41,7 +41,7 @@
 (defun ivy-kibela-endpoint ()
   (concat "https://" ivy-kibela-team ".kibe.la/api/v1"))
 
-(defconst ivy-kibela-query
+(defconst ivy-kibela-recent-query
   (graphql-query
    ((notes
      :arguments ((first . 100))
@@ -76,12 +76,12 @@
     (if url
         (browse-url url))))
 
-(defun ivy-kibela ()
+(defun ivy-kibela-recent ()
   (interactive)
   (request
     (ivy-kibela-endpoint)
     :type "POST"
-    :data (json-encode `(("query" . ,ivy-kibela-query)))
+    :data (json-encode `(("query" . ,ivy-kibela-recent-query)))
     :parser 'json-read
     :encoding 'utf-8
     :headers (ivy-kibela-headers)
