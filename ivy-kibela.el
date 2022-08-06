@@ -49,6 +49,15 @@
       (node title url)))))
   "Fetch notes query")
 
+(defconst ivy-kibela-search-query
+  (graphql-query
+   (:arguments (($query . String!))
+    (search
+     :arguments ((first . 100) (query . ($ query)))
+     (edges
+      (node title url)))))
+  "Search query")
+
 (defun ivy-kibela-headers ()
   "HTTP request headers."
   `(("Content-Type" . "application/json")
@@ -64,7 +73,8 @@
 
 (defun ivy-kibela-action (title)
   (let ((url (get-text-property 0 'url title)))
-    (browse-url url)))
+    (if url
+        (browse-url url))))
 
 (defun ivy-kibela ()
   (interactive)
@@ -84,6 +94,46 @@
                             collection
                             :caller 'ivy-kibela
                             :action #'ivy-kibela-action))))))
+
+(defun ivy-kibela-search ()
+  (interactive)
+  (ivy-read "Kibela notes: "
+            #'ivy-kibela-search-request
+            :dynamic-collection t
+            :caller 'ivy-kibela-search
+            :action #'ivy-kibela-action))
+
+(defun ivy-kibela-search-request (str)
+  (or
+   (ivy-more-chars)
+   (progn
+     ;; (ivy-kibela-unwind)
+     (let ((query ivy-kibela-search-query))
+       (setq ivy-kibela-request-response
+             (request
+               (ivy-kibela-endpoint)
+               :type "POST"
+               :data (json-encode `(("query" . ,query) ("variables" . ,(list (cons "query" str)))))
+               :parser 'json-read
+               :encoding 'utf-8
+               :headers (ivy-kibela-headers)
+               ;; :unwind #'ivy-kibela-unwind
+               ;; :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys) (message "Got error: %S" error-thrown)))
+               :success (cl-function
+                         (lambda (&key data &allow-other-keys)
+                           (let* ((json-data (assq 'data (graphql-simplify-response-edges data)))
+                                  (notes (assoc-default 'search json-data))
+                                  (collection (ivy-kibela-build-collection-from-notes notes)))
+                             (ivy-update-candidates collection)))))))
+     '("" "working..."))))
+
+(defvar ivy-kibela-request-response nil)
+
+(defun ivy-kibela-unwind ()
+  "Delete any open kibela connections."
+  (if ivy-kibela-request-response
+      (request-abort ivy-kibela-request-response))
+  (setq ivy-kibela-request-response nil))
 
 (defun ivy-kibela-transformer (str)
   str)
