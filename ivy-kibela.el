@@ -38,10 +38,16 @@
   :group 'ivy-kibela
   :type 'string)
 
+(defcustom ivy-kibela-default-command 'recent
+  "Call this command if you execute `M-x ivy-kibela'"
+  :group 'ivy-kibela
+  :type '(choice (const :tag "Recent" recent)
+                 (const :tag "Search" search)))
+
 (defun ivy-kibela-endpoint ()
   (concat "https://" ivy-kibela-team ".kibe.la/api/v1"))
 
-(defconst ivy-kibela-query
+(defconst ivy-kibela-recent-query
   (graphql-query
    ((notes
      :arguments ((first . 100))
@@ -76,12 +82,12 @@
     (if url
         (browse-url url))))
 
-(defun ivy-kibela ()
+(defun ivy-kibela-recent ()
   (interactive)
   (request
     (ivy-kibela-endpoint)
     :type "POST"
-    :data (json-encode `(("query" . ,ivy-kibela-query)))
+    :data (json-encode `(("query" . ,ivy-kibela-recent-query)))
     :parser 'json-read
     :encoding 'utf-8
     :headers (ivy-kibela-headers)
@@ -128,6 +134,15 @@
      '("" "working..."))))
 
 (defvar ivy-kibela-request-response nil)
+
+(defun ivy-kibela ()
+  (interactive)
+  (cond
+   ((eq ivy-kibela-default-command 'recent)
+    (ivy-kibela-recent))
+   ((eq ivy-kibela-default-command 'search)
+    (ivy-kibela-search))
+   (t (message "Unexpected command"))))
 
 (defun ivy-kibela-unwind ()
   "Delete any open kibela connections."

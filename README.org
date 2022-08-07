@@ -11,6 +11,7 @@
 
    - ivy :: 0.13.0
    - graphql :: 0.1.1
+   - request :: 0.3.3
 
 ** el-get でのインストール
 
@@ -19,35 +20,71 @@
    #+end_example
 
 * 設定
+** 基本設定
+   ~ivy-kibela-team~ と ~ivy-kibela-access-token~ というカスタム変数を用意しています。
 
-  ~ivy-kibela-team~ と ~ivy-kibela-access-token~ というカスタム変数を用意しています。
+   ~ivy-kibela-team~ は貴方が所属しているチームの subdomain です。
+   もしログイン先が ~https://foo.kibe.la~ であればここの値は ~foo~ となります。
 
-  ~ivy-kibela-team~ は貴方が所属しているチームの subdomain です。
-  もしログイン先が ~https://foo.kibe.la~ であればここの値は ~foo~ となります。
+   ~ivy-kibela-access-token~ はあなたの個人アクセストークンを設定します。
 
-  ~ivy-kibela-access-token~ はあなたの個人アクセストークンを設定します。
+   個人アクセストークンは Kibela にログイン後、
+   右上の顔アイコン→設定→個人アクセストークンと辿り、
+   「アクセストークンの作成」をクリックすることで作成できます。
 
-  個人アクセストークンは Kibela にログイン後、
-  右上の顔アイコン→設定→個人アクセストークンと辿り、
-  「アクセストークンの作成」をクリックすることで作成できます。
+   ivy-kibela では書き込みはしないので、read 権限だけ有効にすることをオススメします。
 
-  ivy-kibela では書き込みはしないので、read 権限だけ有効にすることをオススメします。
+*** コードによる設定例
 
-** コードによる設定例
+    #+begin_src emacs-lisp
+    (custom-set-variables
+     '(ivy-kibela-team "foo")
+     '(ivy-kibela-access-token "secret/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")))
+    #+end_src
 
-   #+begin_src emacs-lisp
-   (custom-set-variables
-    '(ivy-kibela-team "foo")
-    '(ivy-kibela-access-token "secret/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")))
-   #+end_src
+** その他の設定
+*** ivy-kibela-default-command
+    :PROPERTIES:
+    :ID:       da0ac58a-b8cb-46bb-a838-d424ac2aad6c
+    :END:
+    ~ivy-kibela-default-command~ というカスタム変数を変更することで
+    ~ivy-kibela~ コマンドの挙動を変えることができます。
 
-* 使い方
+    設定できる値は2つで、それぞれ以下の挙動となります
 
-  ivy-kibela コマンドを実行することで、直近100件の記事を取得します。
+    - recent :: 直近 100 件の記事を取得する ~ivy-kibela-recent~ に切り替えます。
+    - search :: Kibela の検索 API を ivy インターフェースから呼び出す ~ivy-kibela-search~ に切り替えます。
 
-  #+begin_example
-  M-x ivy-kibela
-  #+end_example
+* 利用できるコマンド
+** ivy-kibela-recent
+   ~ivy-kibela-recent~ コマンドを実行することで、直近100件の記事を取得します。
 
-  そのあとは ivy のインターフェースでその100件の記事から絞り込みます。
-  記事を選択し Enter を叩くことでその記事をブラウザで開くようになっています。
+   #+begin_example
+   M-x ivy-kibela-recent
+   #+end_example
+
+   そのあとは ivy のインターフェースでその100件の記事から絞り込みます。
+   記事を選択し Enter を叩くことでその記事をブラウザで開くようになっています。
+** ivy-kibela-search
+   ~ivy-kibela-search~ コマンドを実行することで、
+   ivy のインターフェースが立ち上がります。
+
+   #+begin_example
+   M-x ivy-kibela-search
+   #+end_example
+
+   この後、3文字以上入力することで
+   Kibela の検索 API を呼び出し、その結果を ivy で選択することができます。
+
+   3文字以上入力されている場合は、入力の度に API を呼び出すため
+   利用コストを大幅に消費する恐れがあります。
+
+   そのため、直近の記事を取得する場合は ~ivy-kibela-recent~ を利用することをオススメします。
+** ivy-kibela
+   :PROPERTIES:
+   :ID:       d6dd07cc-5fd1-4d2c-a256-a5719fdc5ce2
+   :END:
+   デフォルトでは ~ivy-kibela-recent~ を実行します。
+
+   [[id:da0ac58a-b8cb-46bb-a838-d424ac2aad6c][ivy-kibela-default-command]] を ~search~ に変更することで
+   ~ivy-kibela-search~ を実行するようになります。
