@@ -33,6 +33,7 @@
 
 (require 'ivy)
 (require 'graphql)
+(require 'request)
 
 (defcustom ivy-kibela-team nil
   "Kibela team name for login."
