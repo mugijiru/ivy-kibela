@@ -59,7 +59,7 @@
    ((notes
      :arguments ((first . 100))
      (edges
-      (node title url)))))
+      (node id title url)))))
   "Fetch notes query")
 
 (defconst ivy-kibela-search-query
@@ -80,8 +80,9 @@
 (defun ivy-kibela-build-collection-from-notes (notes)
   (mapcar (lambda (note)
           (let ((str (assoc-default 'title note))
+                (id (assoc-default 'id note))
                 (url (assoc-default 'url note)))
-            (propertize str 'url url)))
+            (propertize str 'id id 'url url)))
           notes))
 
 (defun ivy-kibela-action (title)
