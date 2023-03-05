@@ -59,7 +59,7 @@
    ((notes
      :arguments ((first . 100))
      (edges
-      (node title url)))))
+      (node id title url)))))
   "Fetch notes query")
 
 (defconst ivy-kibela-search-query
@@ -80,8 +80,9 @@
 (defun ivy-kibela-build-collection-from-notes (notes)
   (mapcar (lambda (note)
           (let ((str (assoc-default 'title note))
+                (id (assoc-default 'id note))
                 (url (assoc-default 'url note)))
-            (propertize str 'url url)))
+            (propertize str 'id id 'url url)))
           notes))
 
 (defun ivy-kibela-action (title)
@@ -89,7 +90,7 @@
     (if url
         (browse-url url))))
 
-(defun ivy-kibela-recent ()
+(defun ivy-kibela-recent (&optional action)
   (interactive)
   (request
     (ivy-kibela-endpoint)
@@ -106,7 +107,7 @@
                   (ivy-read "Kibela notes: "
                             collection
                             :caller 'ivy-kibela
-                            :action #'ivy-kibela-action))))))
+                            :action (or action #'ivy-kibela-action)))))))
 
 (defun ivy-kibela-search ()
   (interactive)
@@ -120,7 +121,6 @@
   (or
    (ivy-more-chars)
    (progn
-     ;; (ivy-kibela-unwind)
      (let ((query ivy-kibela-search-query))
        (setq ivy-kibela-request-response
              (request
@@ -130,8 +130,6 @@
                :parser 'json-read
                :encoding 'utf-8
                :headers (ivy-kibela-headers)
-               ;; :unwind #'ivy-kibela-unwind
-               ;; :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys) (message "Got error: %S" error-thrown)))
                :success (cl-function
                          (lambda (&key data &allow-other-keys)
                            (let* ((json-data (assq 'data (graphql-simplify-response-edges data)))
