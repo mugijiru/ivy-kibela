@@ -120,7 +120,6 @@
   (or
    (ivy-more-chars)
    (progn
-     ;; (ivy-kibela-unwind)
      (let ((query ivy-kibela-search-query))
        (setq ivy-kibela-request-response
              (request
@@ -130,8 +129,6 @@
                :parser 'json-read
                :encoding 'utf-8
                :headers (ivy-kibela-headers)
-               ;; :unwind #'ivy-kibela-unwind
-               ;; :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys) (message "Got error: %S" error-thrown)))
                :success (cl-function
                          (lambda (&key data &allow-other-keys)
                            (let* ((json-data (assq 'data (graphql-simplify-response-edges data)))
