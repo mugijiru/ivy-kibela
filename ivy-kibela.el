@@ -90,7 +90,7 @@
     (if url
         (browse-url url))))
 
-(defun ivy-kibela-recent ()
+(defun ivy-kibela-recent (&optional action)
   (interactive)
   (request
     (ivy-kibela-endpoint)
@@ -107,7 +107,7 @@
                   (ivy-read "Kibela notes: "
                             collection
                             :caller 'ivy-kibela
-                            :action #'ivy-kibela-action))))))
+                            :action (or action #'ivy-kibela-action)))))))
 
 (defun ivy-kibela-search ()
   (interactive)
