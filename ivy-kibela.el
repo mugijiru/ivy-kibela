@@ -62,6 +62,18 @@
       (node id title url)))))
   "Fetch notes query")
 
+(defconst ivy-kibela-recent-browsing-notes-query
+  (graphql-query
+   ((noteBrowsingHistories
+     :arguments((first . 100))
+     (edges
+      (node
+       (note
+        id
+        title
+        url))))))
+  "Fetch recent browsing notes query")
+
 (defconst ivy-kibela-search-query
   (graphql-query
    (:arguments (($query . String!))
@@ -105,6 +117,27 @@
                        (notes (assoc-default 'notes json-data))
                        (collection (ivy-kibela-build-collection-from-notes notes)))
                   (ivy-read "Kibela notes: "
+                            collection
+                            :caller 'ivy-kibela
+                            :action (or action #'ivy-kibela-action)))))))
+
+(defun ivy-kibela-recent-browsing-notes (&optional action)
+  "Fetch recent browsing notes."
+  (interactive)
+  (request
+    (ivy-kibela-endpoint)
+    :type "POST"
+    :data (json-encode `(("query" . ,ivy-kibela-recent-browsing-notes-query)))
+    :parser 'json-read
+    :encoding 'utf-8
+    :headers (ivy-kibela-headers)
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                (let* ((json-data (assq 'data (graphql-simplify-response-edges data)))
+                       (browsing-histories (assoc-default 'noteBrowsingHistories json-data))
+                       (notes (seq-uniq (mapcar (lambda (history) (assoc-default 'note history)) browsing-histories)))
+                       (collection (ivy-kibela-build-collection-from-notes notes)))
+                  (ivy-read "Kibela recent browsing notes: "
                             collection
                             :caller 'ivy-kibela
                             :action (or action #'ivy-kibela-action)))))))
